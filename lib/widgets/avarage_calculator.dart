@@ -1,5 +1,6 @@
 import 'package:dynamic_ort_hesapla/helper/data_helper.dart';
 import 'package:dynamic_ort_hesapla/model/lesson.dart';
+import 'package:dynamic_ort_hesapla/widgets/credits_dropdown.dart';
 import 'package:dynamic_ort_hesapla/widgets/lesson_list.dart';
 import 'package:dynamic_ort_hesapla/widgets/letter_notes_dropdown.dart';
 import 'package:dynamic_ort_hesapla/widgets/show_avarage.dart';
@@ -15,7 +16,7 @@ class AvarageCalculator extends StatefulWidget {
 
 class _AvarageCalculatorState extends State<AvarageCalculator> {
   double chosenLetter1 = 0;
-  double chosenCredit = 1;
+  double chosenCredit1 = 1;
   String lessonName = '';
   var formKey = GlobalKey<FormState>();
   @override
@@ -89,7 +90,11 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: _buildCredits(),
+                child: CreditDropdown(
+                  onCreditChose: (chosenCredit) {
+                    chosenCredit1 = chosenCredit;
+                  },
+                ),
               ),
             ),
             IconButton(
@@ -130,28 +135,6 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
     );
   }
 
-  _buildCredits() {
-    return Container(
-      alignment: Alignment.center,
-      padding: Constants.dropDownPadding,
-      decoration: BoxDecoration(
-        color: Constants.mainColor.shade100.withOpacity(0.2),
-        borderRadius: Constants.borderRadius,
-      ),
-      child: DropdownButton<double>(
-          underline: Container(),
-          value: chosenCredit,
-          elevation: 16,
-          iconEnabledColor: Constants.mainColor.shade800,
-          onChanged: (value) {
-            setState(() {
-              chosenCredit = value!;
-            });
-          },
-          items: DataHelper.tumKrediler()),
-    );
-  }
-
   void _addLessonCalculateAvarage() {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
@@ -159,7 +142,7 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
           letter: DataHelper.notesToLetter(chosenLetter1),
           name: lessonName,
           letterNote: chosenLetter1,
-          credi: chosenCredit);
+          credi: chosenCredit1);
       DataHelper.addLesson(lessonForAdd);
       setState(() {});
     }
