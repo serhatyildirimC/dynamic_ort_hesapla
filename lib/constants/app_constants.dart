@@ -20,4 +20,6 @@ class Constants {
     fontWeight: FontWeight.w800,
     color: mainColor,
   );
+  static const dropDownPadding =
+      EdgeInsets.symmetric(horizontal: 16, vertical: 8);
 }

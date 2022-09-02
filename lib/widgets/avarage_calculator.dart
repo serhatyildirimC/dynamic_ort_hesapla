@@ -88,7 +88,7 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
 
   _buildLetterNotes() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: Constants.dropDownPadding,
       decoration: BoxDecoration(
         color: Constants.mainColor.shade100.withOpacity(0.2),
         borderRadius: Constants.borderRadius,
