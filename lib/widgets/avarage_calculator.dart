@@ -1,4 +1,7 @@
 import 'package:dynamic_ort_hesapla/helper/data_helper.dart';
+import 'package:dynamic_ort_hesapla/model/lesson.dart';
+import 'package:dynamic_ort_hesapla/widgets/lesson_list.dart';
+import 'package:dynamic_ort_hesapla/widgets/letter_notes_dropdown.dart';
 import 'package:dynamic_ort_hesapla/widgets/show_avarage.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
@@ -11,11 +14,14 @@ class AvarageCalculator extends StatefulWidget {
 }
 
 class _AvarageCalculatorState extends State<AvarageCalculator> {
-  double? chosenLetter;
+  double chosenLetter1 = 0;
+  double chosenCredit = 1;
+  String lessonName = '';
   var formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -36,14 +42,23 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
                   child: _buildForm(),
                 ),
                 Expanded(
-                  child: ShowAvarage(avarage: 2.57412724, lessonCount: 5),
+                  child: ShowAvarage(
+                      avarage: DataHelper.calculateAvarage(),
+                      lessonCount: DataHelper.allLessons.length),
                 ),
               ],
             ),
+            const SizedBox(
+              height: 5,
+            ),
+            // ignore: prefer_const_constructors
             Expanded(
-              child: Container(
-                color: Colors.blue,
-                child: Text('LIST YER TUTUCU'),
+              // ignore: prefer_const_constructors
+              child: LessonList(
+                onDismiss: (index) {
+                  DataHelper.allLessons.removeAt(index);
+                  setState(() {});
+                },
               ),
             ),
           ],
@@ -55,17 +70,35 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
       key: formKey,
       child: Column(children: [
         _buildTextFormField(),
+        const SizedBox(
+          height: 5,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildLetterNotes(),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.abc_sharp),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: LetterNoteDropdown(
+                  onLetterChose: (chosenLetter) {
+                    chosenLetter1 = chosenLetter;
+                  },
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: _buildCredits(),
+              ),
             ),
             IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.abc_sharp),
+              onPressed: () {
+                _addLessonCalculateAvarage();
+              },
+              icon: const Icon(Icons.arrow_forward_ios_sharp),
+              color: Constants.mainColor,
+              iconSize: 30,
             ),
           ],
         )
@@ -75,10 +108,21 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
 
   Widget _buildTextFormField() {
     return TextFormField(
+      onSaved: (value) {
+        lessonName = value!;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Ders adi giriniz';
+        } else {
+          return null;
+        }
+      },
       decoration: InputDecoration(
-        hintText: 'asdfsdag',
+        hintText: 'Ders Adi Giriniz',
         border: OutlineInputBorder(
           borderRadius: Constants.borderRadius,
+          borderSide: BorderSide.none,
         ),
         filled: true,
         fillColor: Constants.mainColor.shade100.withOpacity(0.2),
@@ -86,8 +130,9 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
     );
   }
 
-  _buildLetterNotes() {
+  _buildCredits() {
     return Container(
+      alignment: Alignment.center,
       padding: Constants.dropDownPadding,
       decoration: BoxDecoration(
         color: Constants.mainColor.shade100.withOpacity(0.2),
@@ -95,15 +140,28 @@ class _AvarageCalculatorState extends State<AvarageCalculator> {
       ),
       child: DropdownButton<double>(
           underline: Container(),
-          value: chosenLetter,
+          value: chosenCredit,
           elevation: 16,
           iconEnabledColor: Constants.mainColor.shade800,
           onChanged: (value) {
             setState(() {
-              chosenLetter = value;
+              chosenCredit = value!;
             });
           },
-          items: DataHelper.tumDerslerinHarfleri()),
+          items: DataHelper.tumKrediler()),
     );
+  }
+
+  void _addLessonCalculateAvarage() {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      var lessonForAdd = Lesson(
+          letter: DataHelper.notesToLetter(chosenLetter1),
+          name: lessonName,
+          letterNote: chosenLetter1,
+          credi: chosenCredit);
+      DataHelper.addLesson(lessonForAdd);
+      setState(() {});
+    }
   }
 }

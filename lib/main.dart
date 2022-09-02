@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Constants.mainColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AvarageCalculator(),
+      home: const AvarageCalculator(),
     );
   }
 }
